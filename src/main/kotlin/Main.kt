@@ -2,11 +2,12 @@ import kotlinx.coroutines.*
 import kotlin.system.measureTimeMillis
 
 fun main() {
-    //example1()
+    example4()
     //example2()
-    example3()
+    //example3()
 }
 fun example1(){
+
     runBlocking{ //umozliwia wykonanie korutyny w biezacym watku, jeden watek moze wykonywac wiele korutyn
         val job = launch {
             println("Start #1 on thread ${Thread.currentThread().name}")
@@ -21,10 +22,8 @@ fun example1(){
         }
     }
     GlobalScope.launch{//zamist runBlocking
-            println("KOLEJNY TASK PO WSZYSTKICH INNYCH")
+        println("KOLEJNY TASK PO WSZYSTKICH INNYCH")
     }
-
-
     }
 
 fun example2() {
@@ -61,11 +60,12 @@ fun example3(){
                 }
                 println("Completed in $time ms")
             }
-            delay(4100)
-            println("DELAY HAS ENDED")
-            println(doSomethingUsefulOne())
-
-    }
+            launch {
+                delay(1000)
+                println("DELAY HAS ENDED")
+                println(doSomethingUsefulOne())
+            }
+        }
         println("WHOLE PROGRAM completed in $continuum ms")
     }
     //KORUTYNY WYKONUJĄ SIĘ ASYNCHRONICZNIE, ACZKOLWIEK PIERWSZE ZOSTANĄ WYPRINTOWANE
@@ -78,3 +78,31 @@ suspend fun doSomethingUsefulTwo(): Int {
     delay(1500L) // pretend we are doing something useful here, too
     return 29
 }
+//CORUTINE DISPATCHERS - opisują w jakich wątków korutyna używa
+//Dzięki nim można ograniczyć wykonanie korutyny do danego wątku, wysłać je do puli wątków lub pozwolić działać bez ograniczeń
+//Launch bez parametrów dziedziczy kontekst ( a więc dispatcher ) z runBlocking korutyny, która działa w głównym wątku
+// I tak dalej, nie jestem pewien czy to będzie jakieś giga ważne
+fun example4(){
+    runBlocking {
+        launch { // context of the parent, main runBlocking coroutine
+            println("main runBlocking      : I'm working in thread ${Thread.currentThread().name}")
+        }
+        launch(Dispatchers.Unconfined) { // not confined -- will work with main thread
+            println("Unconfined            : I'm working in thread ${Thread.currentThread().name}")
+        }
+        launch(Dispatchers.Default) { // will get dispatched to DefaultDispatcher
+            println("Default               : I'm working in thread ${Thread.currentThread().name}")
+        }
+        launch(newSingleThreadContext("MyOwnThread")) { // will get its own new thread
+            println("newSingleThreadContext: I'm working in thread ${Thread.currentThread().name}")
+        }
+        println("IM WORKING IN         : ${Thread.currentThread().name}")
+    }
+}
+//TO DO
+//1. Dokładnie opisać sposób działania funkcji yield()
+//2. Ogarnąć, o co mogło chodzić zielonce, kiedy powiedział, że mamy wymienić różne "pule", są to jakieś klasy? Idk
+//3. Można pokombinować z różnymi przykładami z tym yield() itd., jeżeli jest coś ciekawego do zilustrowania
+//   jedną z tych ilustracji jest pokazanie, ile czasu zaoszczędzamy korutynami, także można zmodyfikować poprzednie podpunkty
+//4. Opisać wszystkie elementy na doc'u i wstawić poszczególne slide'y do prezentacji
+//5. Trzeba też opisać lepiej sqlite, ale to Agnieszka chyba zaczęła już robić

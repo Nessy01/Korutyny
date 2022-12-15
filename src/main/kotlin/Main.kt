@@ -106,3 +106,4 @@ fun example4(){
 //   jedną z tych ilustracji jest pokazanie, ile czasu zaoszczędzamy korutynami, także można zmodyfikować poprzednie podpunkty
 //4. Opisać wszystkie elementy na doc'u i wstawić poszczególne slide'y do prezentacji
 //5. Trzeba też opisać lepiej sqlite, ale to Agnieszka chyba zaczęła już robić
+//6. Czym jest zakres korutyn w viewmodelu?

@@ -41,6 +41,14 @@ fun example2() {
     }
 }
 fun example3(){
+    //wszystko wykonuje się asynchronicznie
+    //na początku wykona się "FIRST PRINT" ponieważ najszybciej będzie trwać jego wykonanie,
+    //następnie odpala się korutyna, w której asynchronicznie wykonują się dane funkcje, a więc całość będzie trwać tyle,
+    //co najdłuższa funkcja w korutynie, a więc 4 sekundy. Jednocześnie asynchronicznie wykonuje się funkcja delay(4100)
+    //a więc praktycznie zaraz po poprzedniej korutynie delay przestaje działać i od razu wykonują się dalsze instrukcje
+    //które trwają około kolejnych 4 sekund.
+    //całość programu zatem trwa ok 8 sekund.
+    //EKSPERYMENT: Zmniejsz delay do 1 sekundy i zgadnij co się stanie
     runBlocking {
         val continuum = measureTimeMillis {
         println("FIRST PRINT")

@@ -106,3 +106,5 @@ fun example4(){
 //   jedną z tych ilustracji jest pokazanie, ile czasu zaoszczędzamy korutynami, także można zmodyfikować poprzednie podpunkty
 //4. Opisać wszystkie elementy na doc'u i wstawić poszczególne slide'y do prezentacji
 //5. Trzeba też opisać lepiej sqlite, ale to Agnieszka chyba zaczęła już robić
+//   -Aga- skończyłam opisywać kod wiec przeczytajcie ten tekst, jak coś sie nie podoba mozecie pozmieniac ofc xd
+//    nie wiem czy jeszcze czegos tam nie dodać, jestem otwarta na propozycje

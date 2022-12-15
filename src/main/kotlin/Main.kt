@@ -23,7 +23,10 @@ fun example1(){
     GlobalScope.launch{//zamist runBlocking
             println("KOLEJNY TASK PO WSZYSTKICH INNYCH")
     }
-}
+
+
+    }
+
 fun example2() {
     runBlocking {
         val job = launch {
@@ -39,22 +42,31 @@ fun example2() {
 }
 fun example3(){
     runBlocking {
-        launch {
-            val time = measureTimeMillis {
-                val one = async { doSomethingUsefulOne() }
-                val two = async { doSomethingUsefulTwo() }
-                println("The answer is ${one.await() + two.await()}")
+        val continuum = measureTimeMillis {
+        println("FIRST PRINT")
+            launch {
+                val time = measureTimeMillis {
+                    val one = async { doSomethingUsefulOne() }
+                    val two = async { doSomethingUsefulTwo() }
+                    val three = async { doSomethingUsefulTwo() }
+                    println("The answer is ${one.await() + two.await() + three.await()}")
+                }
+                println("Completed in $time ms")
             }
-            println("Completed in $time ms")
-        }
+            delay(4100)
+            println("DELAY HAS ENDED")
+            println(doSomethingUsefulOne())
+
     }
+        println("WHOLE PROGRAM completed in $continuum ms")
+    }
+    //KORUTYNY WYKONUJĄ SIĘ ASYNCHRONICZNIE, ACZKOLWIEK PIERWSZE ZOSTANĄ WYPRINTOWANE
 }
 suspend fun doSomethingUsefulOne(): Int {
-    delay(1000L) // pretend we are doing something useful here
+    delay(4000L) // pretend we are doing something useful here
     return 13
 }
-
 suspend fun doSomethingUsefulTwo(): Int {
-    delay(1000L) // pretend we are doing something useful here, too
+    delay(1500L) // pretend we are doing something useful here, too
     return 29
 }

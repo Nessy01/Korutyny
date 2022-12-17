@@ -2,7 +2,7 @@ import kotlinx.coroutines.*
 import kotlin.system.measureTimeMillis
 
 fun main() {
-    example4()
+    example3()
     //example2()
     //example3()
 }
@@ -48,26 +48,30 @@ fun example3(){
     //które trwają około kolejnych 4 sekund.
     //całość programu zatem trwa ok 8 sekund.
     //EKSPERYMENT: Zmniejsz delay do 1 sekundy i zgadnij co się stanie
+    val continuum = measureTimeMillis {
     runBlocking {
-        val continuum = measureTimeMillis {
+
         println("FIRST PRINT")
-            launch {
-                val time = measureTimeMillis {
-                    val one = async { doSomethingUsefulOne() }
-                    val two = async { doSomethingUsefulTwo() }
-                    val three = async { doSomethingUsefulTwo() }
-                    println("The answer is ${one.await() + two.await() + three.await()}")
-                }
-                println("Completed in $time ms")
+        launch {
+            val time = measureTimeMillis {
+                val one = async { doSomethingUsefulOne() }
+                val two = async { doSomethingUsefulTwo() }
+                val three = async { doSomethingUsefulTwo() }
+                println("The answer is ${one.await() + two.await() + three.await()}")
             }
-            launch {
-                delay(1000)
-                println("DELAY HAS ENDED")
+            println("Completed in $time ms")
+        }
+
+        launch {
+            val time2 = measureTimeMillis {
+                delay(4100)
                 println(doSomethingUsefulOne())
             }
+            println("Part 2 lasted for $time2")
         }
-        println("WHOLE PROGRAM completed in $continuum ms")
     }
+    }
+    println("WHOLE PROGRAM completed in $continuum ms")
     //KORUTYNY WYKONUJĄ SIĘ ASYNCHRONICZNIE, ACZKOLWIEK PIERWSZE ZOSTANĄ WYPRINTOWANE
 }
 suspend fun doSomethingUsefulOne(): Int {

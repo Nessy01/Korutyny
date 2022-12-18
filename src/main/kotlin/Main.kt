@@ -1,8 +1,9 @@
 import kotlinx.coroutines.*
+import java.awt.font.TextMeasurer
 import kotlin.system.measureTimeMillis
 
 fun main() {
-    example3()
+    example5()
     //example2()
     //example3()
 }
@@ -24,22 +25,49 @@ fun example1(){
     GlobalScope.launch{//zamist runBlocking
         println("KOLEJNY TASK PO WSZYSTKICH INNYCH")
     }
+}
+fun example2(){
+
+    GlobalScope.launch{
+        delay(1000)
+        println("GLOBAL SCOPE")
     }
 
-fun example2() {
+
+    runBlocking {
+
+        launch {
+            delay(2000)
+            println("FIRST MESSAGE")
+        }
+        launch {
+            delay(2000)
+            println("SECOND MESSAGE")
+        }
+        launch{
+            delay(100)
+            println("THIRD MESSAGE")
+        }
+        async{
+            println("Hello there")
+        }
+
+    }
+    println("RUNBLOCKING HAS ENDED")
+
+}
+fun example3() {
     runBlocking {
         val job = launch {
-            println("Start #1 on thread ${Thread.currentThread().name}")
-            //yield() // suspension point
-            println("Exit #1 on thread ${Thread.currentThread().name}")
-            delay(1000) // czeka sekunde
+            println("Hello world")
+            delay(1000)
             println("MESSAGE NOT VIEWED")
         }
         delay(500)
-        job.cancel() // do zaprezentowania jak canceluje
+        job.cancel() // cancells job coroutine
     }
 }
-fun example3(){
+fun example4(){
     //wszystko wykonuje się asynchronicznie
     //na początku wykona się "FIRST PRINT" ponieważ najszybciej będzie trwać jego wykonanie,
     //następnie odpala się korutyna, w której asynchronicznie wykonują się dane funkcje, a więc całość będzie trwać tyle,
@@ -69,11 +97,24 @@ fun example3(){
             }
             println("Part 2 lasted for $time2")
         }
-    }
-    }
+    } }
     println("WHOLE PROGRAM completed in $continuum ms")
-    //KORUTYNY WYKONUJĄ SIĘ ASYNCHRONICZNIE, ACZKOLWIEK PIERWSZE ZOSTANĄ WYPRINTOWANE
 }
+fun example5(){
+runBlocking {
+    launch {
+        val time = measureTimeMillis {
+            println("FIRST PRINT")
+            val one = doSomethingUsefulOne()
+            val two = doSomethingUsefulTwo()
+            val three = doSomethingUsefulTwo()
+            println("The answer is: ${one + two + three}")
+            delay(4100)
+            println(doSomethingUsefulOne())
+        }
+        println("ended in $time")
+    }
+} }
 suspend fun doSomethingUsefulOne(): Int {
     delay(4000L) // pretend we are doing something useful here
     return 13
@@ -86,7 +127,7 @@ suspend fun doSomethingUsefulTwo(): Int {
 //Dzięki nim można ograniczyć wykonanie korutyny do danego wątku, wysłać je do puli wątków lub pozwolić działać bez ograniczeń
 //Launch bez parametrów dziedziczy kontekst ( a więc dispatcher ) z runBlocking korutyny, która działa w głównym wątku
 // I tak dalej, nie jestem pewien czy to będzie jakieś giga ważne
-fun example4(){
+fun example6(){
     runBlocking {
         launch { // context of the parent, main runBlocking coroutine
             println("main runBlocking      : I'm working in thread ${Thread.currentThread().name}")
@@ -103,11 +144,4 @@ fun example4(){
         println("IM WORKING IN         : ${Thread.currentThread().name}")
     }
 }
-//TO DO
-//1. Dokładnie opisać sposób działania funkcji yield()
-//2. Ogarnąć, o co mogło chodzić zielonce, kiedy powiedział, że mamy wymienić różne "pule", są to jakieś klasy? Idk
-//3. Można pokombinować z różnymi przykładami z tym yield() itd., jeżeli jest coś ciekawego do zilustrowania
-//   jedną z tych ilustracji jest pokazanie, ile czasu zaoszczędzamy korutynami, także można zmodyfikować poprzednie podpunkty
-//4. Opisać wszystkie elementy na doc'u i wstawić poszczególne slide'y do prezentacji
-//5. Trzeba też opisać lepiej sqlite, ale to Agnieszka chyba zaczęła już robić
-//6. Czym jest zakres korutyn w viewmodelu?
+

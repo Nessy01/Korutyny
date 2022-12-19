@@ -1,9 +1,10 @@
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import java.awt.font.TextMeasurer
 import kotlin.system.measureTimeMillis
 
 fun main() {
-    example6()
+    example10()
 }
 
 fun example1() {
@@ -151,3 +152,73 @@ fun example6() {
     }
 }
 
+/** Funkcje zawieszona
+ * m.in. delay() mogą być wywołane tylko z korutyny lub innej zawieszonej funkcji
+ */
+fun example7() {
+    runBlocking {
+        suspendDelay()
+    }
+    println("Done.")
+}
+
+suspend fun suspendDelay() {
+    delay(1000L)
+}
+
+/**
+ * Przykład prezentujący działanie runBlocking { }
+ * W przypadku normalnego wywołania jobów, Thread nie czeka na ich zakończenie - napis 'World' się nie pokaże na ekranie
+ */
+fun example8() {
+//fun example8() = runBlocking {
+    val job = GlobalScope.launch {
+        delay(2000L)
+        println("World")
+    }
+    println("Hello")
+
+//    job.join()
+}
+
+/**
+ * Przykład pokazujący działanie Channel interface
+ */
+fun example9() = runBlocking<Unit> {
+    val channel = Channel<String>()
+    launch {
+        channel.send("A1")
+        channel.send("A2")
+        log("A done")
+    }
+    launch {
+        channel.send("B1")
+        log("B done")
+    }
+    launch {
+        repeat(3) {
+            val x = channel.receive()
+            log(x)
+        }
+    }
+}
+fun log(message: Any?) {
+    println("[${Thread.currentThread().name}] $message")
+}
+
+/** Funkcja yield()
+ * Punkt zawieszenia
+ */
+fun example10() {
+    runBlocking {
+        launch {
+            println("Start #1 on thread ${Thread.currentThread().name}")
+            yield() // suspension point
+            println("Exit #1 on thread ${Thread.currentThread().name}")
+        }
+        launch {
+            println("Start #2 on thread ${Thread.currentThread().name}")
+            println("Exit #2 on thread ${Thread.currentThread().name}")
+        }
+    }
+}

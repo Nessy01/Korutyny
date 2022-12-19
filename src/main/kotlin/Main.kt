@@ -3,10 +3,21 @@ import kotlinx.coroutines.channels.Channel
 import java.awt.font.TextMeasurer
 import kotlin.system.measureTimeMillis
 
+/**
+ * Program napisany w celu zaprecentowania działania logiki korutyn, wątków,
+ * zakresów, jak i przekazywania danych między nimi
+ */
 fun main() {
-    example10()
+    example8()
 }
 
+/**
+ * Przykład pierwszy prezentuje podstawowe zachowanie korutyn
+ * używa funkcja yield() sprawia, że zadanie (job) zostaje wstrzymane i kontynuowane po wykananiu sekwencyjnym
+ * pozostałych zadań
+ * Opkaowanie komend w runBlocking{} sprawia, że wątek czeka na zakończenie wszystkich jobów wewnątrz scope,
+ * natomiast użycie globalnego zakresu (GlobalScope) nie gwarantuje pewności wykonania kodu wewnątrz.
+ */
 fun example1() {
     runBlocking { // umozliwia wykonanie korutyny w biezacym watku, jeden watek moze wykonywac wiele korutyn
         val job = launch {
@@ -26,6 +37,11 @@ fun example1() {
     }
 }
 
+/**
+ * Przykład prezentujący użycie zakresów GlobalScrope, runBlocking
+ * launch i async - są w tym wypadku tożsame, różnica w metodzyce asynca jest taka,
+ * że funkcja ta zwraca wynik
+ */
 fun example2() {
     GlobalScope.launch {
         delay(1000)
@@ -33,7 +49,6 @@ fun example2() {
     }
 
     runBlocking {
-
         launch {
             delay(2000)
             println("FIRST MESSAGE")
@@ -49,12 +64,16 @@ fun example2() {
         async {
             println("Hello there")
         }
-
     }
 
     println("RUNBLOCKING HAS ENDED")
 }
 
+/**
+ * Przykład prezentujący anulowanie zadania po przekroczeniu danego czasu
+ * Komunikat 'MESSAGE NOT VIEWED' nie wyświetli się z powodu zcancellowania joba
+ * po upływie 500 ms
+ */
 fun example3() {
     runBlocking {
         val job = launch {
@@ -67,7 +86,8 @@ fun example3() {
     }
 }
 
-/** Wszystko wykonuje się asynchronicznie
+/**
+ * Wszystko wykonuje się asynchronicznie
  * na początku wykona się "FIRST PRINT" ponieważ najszybciej będzie trwać jego wykonanie,
  * następnie odpala się korutyna, w której asynchronicznie wykonują się dane funkcje, a więc całość będzie trwać tyle,
  * co najdłuższa funkcja w korutynie, a więc 4 sekundy. Jednocześnie asynchronicznie wykonuje się funkcja delay(4100)
@@ -103,6 +123,11 @@ fun example4() {
     println("WHOLE PROGRAM completed in $continuum ms")
 }
 
+/**
+ * Funkcja analogiczna do przykładu example4, jedyna różnica jest taka,
+ * że tutaj metody nie wywołują się asynchronicznie, a chronologicznie
+ * Czas wykonania całości programu jest dłuższy niemal dwukrotnie
+ */
 fun example5() {
     runBlocking {
         launch {
@@ -120,17 +145,26 @@ fun example5() {
     }
 }
 
+/**
+ * Metoda, która wykonuje w teorii pewne długotrwałe obliczenia
+ * i zwraca wynik
+ */
 suspend fun doSomethingUsefulOne(): Int {
     delay(4000L) // pretend we are doing something useful here
     return 13
 }
 
+/**
+ * Metoda, która wykonuje w teorii pewne długotrwałe obliczenia
+ * i zwraca wynik
+ */
 suspend fun doSomethingUsefulTwo(): Int {
     delay(1500L) // pretend we are doing something useful here, too
     return 29
 }
 
-/** CORUTINE DISPATCHERS - opisują w jakich wątków korutyna używa
+/**
+ * CORUTINE DISPATCHERS - opisują w jakich wątków korutyna używa
  * Dzięki nim można ograniczyć wykonanie korutyny do danego wątku, wysłać je do puli wątków lub pozwolić działać bez ograniczeń
  * Launch bez parametrów dziedziczy kontekst ( a więc dispatcher ) z runBlocking korutyny, która działa w głównym wątku
  */
@@ -152,7 +186,8 @@ fun example6() {
     }
 }
 
-/** Funkcje zawieszona
+/**
+ * Funkcje zawieszona
  * m.in. delay() mogą być wywołane tylko z korutyny lub innej zawieszonej funkcji
  */
 fun example7() {
@@ -162,16 +197,21 @@ fun example7() {
     println("Done.")
 }
 
+/**
+ * Funkcja zawieszona wywołana z poprzez funkcje zawieszoną
+ */
 suspend fun suspendDelay() {
     delay(1000L)
 }
 
 /**
  * Przykład prezentujący działanie runBlocking { }
- * W przypadku normalnego wywołania jobów, Thread nie czeka na ich zakończenie - napis 'World' się nie pokaże na ekranie
+ * W przypadku normalnego wywołania jobów, Thread nie czeka na ich zakończenie
+ * - napis 'World' się nie pokaże na ekranie, natomiast w przypadku opakowania go
+ * w zakres runBlocking i wywołania polecenia join(), program będzie czekał na wykonanie joba
  */
 fun example8() {
-//fun example8() = runBlocking {
+//    fun example8() = runBlocking {
     val job = GlobalScope.launch {
         delay(2000L)
         println("World")
@@ -182,7 +222,8 @@ fun example8() {
 }
 
 /**
- * Przykład pokazujący działanie Channel interface
+ * Przykład pokazujący działanie Channel interface - przekazywania danych
+ * między korutynami
  */
 fun example9() = runBlocking<Unit> {
     val channel = Channel<String>()
@@ -202,11 +243,13 @@ fun example9() = runBlocking<Unit> {
         }
     }
 }
+
 fun log(message: Any?) {
     println("[${Thread.currentThread().name}] $message")
 }
 
-/** Funkcja yield()
+/**
+ * Funkcja yield()
  * Punkt zawieszenia
  */
 fun example10() {

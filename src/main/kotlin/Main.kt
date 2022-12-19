@@ -211,7 +211,7 @@ suspend fun suspendDelay() {
  * w zakres runBlocking i wywołania polecenia join(), program będzie czekał na wykonanie joba
  */
 fun example8() {
-//    fun example8() = runBlocking {
+//fun example8() = runBlocking {
     val job = GlobalScope.launch {
         delay(2000L)
         println("World")

@@ -8,7 +8,7 @@ import kotlin.system.measureTimeMillis
  * zakresów, jak i przekazywania danych między nimi
  */
 fun main() {
-    example8()
+    example1()
 }
 
 /**
